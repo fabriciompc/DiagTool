@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace ConsoleApp1
 {
@@ -12,11 +13,27 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
 
+            var builder = new ConfigurationBuilder()
+                     .AddJsonFile($"appsettings.json", true, true);
+
+
+            IConfiguration config = builder.Build();
+
+
+            var smtpHost = config["SMTP:HOST"];
+            var smtpPort = config["SMTP:PORT"];
+            var smtpUserName = config["SMTP:USERNAME"];
+            var smtpPassword = config["SMTP:PASSWORD"];
+            var smtpFrom = config["SMTP:FROM"];
+            var smtpTo = config["SMTP:TO"];
+
+
             StringBuilder sb = new StringBuilder();
 
             var filename = $"{DateTime.Now.ToString("yyyyMMddHHmmssffff")}.txt";
 
             Console.WriteLine("--------------- DiagTool - Ferramenta de diagnóstico e analise de hardware. ---------------");
+
             Console.Write("Digite seu nome completo: ");
             var name = Console.ReadLine();
 
@@ -83,15 +100,15 @@ namespace ConsoleApp1
             try
             {
                 Console.WriteLine("Processando...");
-                SmtpClient mySmtpClient = new SmtpClient("email-smtp.us-east-1.amazonaws.com", 587);
+                SmtpClient mySmtpClient = new SmtpClient(smtpHost, Int32.Parse(smtpPort));
 
                 mySmtpClient.UseDefaultCredentials = false;
-                System.Net.NetworkCredential basicAuthenticationInfo = new System.Net.NetworkCredential("AKIAVD5T2WDUN6DHMQ7U", "BOQ8jxnzG4zqpbCZD5tM6TJTXzHk4evKrSOGwdlut94p");
+                System.Net.NetworkCredential basicAuthenticationInfo = new System.Net.NetworkCredential(smtpUserName, smtpPassword);
                 mySmtpClient.Credentials = basicAuthenticationInfo;
                 mySmtpClient.EnableSsl = true;
 
-                MailAddress from = new MailAddress("noreply@cpmidias.org.br", "noreply");
-                MailAddress to = new MailAddress("fabricio.sog@gmail.com", "Suporte DiagTool");
+                MailAddress from = new MailAddress(smtpFrom, "DiagTool");
+                MailAddress to = new MailAddress(smtpTo);
                 MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
 
 
@@ -106,7 +123,7 @@ namespace ConsoleApp1
                 myMail.Attachments.Add(data);
 
                 // add ReplyTo
-                MailAddress replyTo = new MailAddress("noreply@cpmidias.org.br");
+                MailAddress replyTo = new MailAddress(smtpFrom);
                 myMail.ReplyToList.Add(replyTo);
 
                 // set subject and encoding
@@ -141,8 +158,6 @@ namespace ConsoleApp1
 
 
         }
-
-
 
         private static void GetComponentAndAppend(string hwclass, string syntax, StringBuilder sb)
         {
