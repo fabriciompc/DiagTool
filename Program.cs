@@ -16,9 +16,7 @@ namespace ConsoleApp1
             var builder = new ConfigurationBuilder()
                      .AddJsonFile($"appsettings.json", true, true);
 
-
             IConfiguration config = builder.Build();
-
 
             var smtpHost = config["SMTP:HOST"];
             var smtpPort = config["SMTP:PORT"];
@@ -26,7 +24,6 @@ namespace ConsoleApp1
             var smtpPassword = config["SMTP:PASSWORD"];
             var smtpFrom = config["SMTP:FROM"];
             var smtpTo = config["SMTP:TO"];
-
 
             StringBuilder sb = new StringBuilder();
 
@@ -48,7 +45,6 @@ namespace ConsoleApp1
             {
                 email = "n/a";
             }
-
 
             sb.AppendLine("==========================================================");
             sb.AppendLine(name.ToUpper());
@@ -111,28 +107,22 @@ namespace ConsoleApp1
                 MailAddress to = new MailAddress(smtpTo);
                 MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
 
-
-                // Create  the file attachment for this email message.
                 Attachment data = new Attachment(filename, MediaTypeNames.Application.Octet);
-                // Add time stamp information for the file.
+        
                 ContentDisposition disposition = data.ContentDisposition;
                 disposition.CreationDate = System.IO.File.GetCreationTime(filename);
                 disposition.ModificationDate = System.IO.File.GetLastWriteTime(filename);
                 disposition.ReadDate = System.IO.File.GetLastAccessTime(filename);
-                // Add the file attachment to this email message.
                 myMail.Attachments.Add(data);
 
-                // add ReplyTo
                 MailAddress replyTo = new MailAddress(smtpFrom);
                 myMail.ReplyToList.Add(replyTo);
 
-                // set subject and encoding
                 myMail.Subject = $"DiagTool - {email}";
                 myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
-                // set body-message and encoding
-                myMail.Body = "<p>Ol&aacute;,</p><p>Uma nova analise foi enviada, favor verificar o arquivo em anexo.</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><strong>DiagTool</strong> -<em> powered by</em> Casa de Software CPMIDIAS.</p>"; myMail.BodyEncoding = System.Text.Encoding.UTF8;
-                // text or html
+                myMail.Body = "<p>Ol&aacute;,</p><p>Uma nova analise foi enviada, favor verificar o arquivo em anexo.</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><strong>DiagTool</strong> -<em> powered by</em> Casa de Software CPMIDIAS.</p>"; 
+                myMail.BodyEncoding = System.Text.Encoding.UTF8;
                 myMail.IsBodyHtml = true;
 
                 Console.WriteLine("Enviando informações...");
@@ -147,13 +137,10 @@ namespace ConsoleApp1
             catch (SmtpException ex)
             {
                 Console.WriteLine(ex.Message);
-                //throw new ApplicationException
-                //("SmtpException has occured: " + ex.Message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                //throw ex;
             }
 
 
