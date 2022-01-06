@@ -86,8 +86,16 @@ namespace ConsoleApp1
             sb.Append("HDD:");
             GetComponentAndAppend("Win32_DiskDrive", "Model", sb);
 
+            sb.Append("DiskSpace:");
+            GetComponentAndAppend("Win32_DiskQuota", "QuotaVolume", sb);
+
             sb.Append("Network:");
             GetComponentAndAppend("Win32_NetworkAdapter", "Name", sb);
+
+            sb.AppendLine("==========================================================");
+            sb.AppendLine("Softwares Installed");
+            sb.AppendLine("==========================================================");
+            GetComponentAndAppend("Win32_Product", "Name", sb);
 
             File.AppendAllText(filename, sb.ToString());
 
@@ -108,7 +116,7 @@ namespace ConsoleApp1
                 MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
 
                 Attachment data = new Attachment(filename, MediaTypeNames.Application.Octet);
-        
+
                 ContentDisposition disposition = data.ContentDisposition;
                 disposition.CreationDate = System.IO.File.GetCreationTime(filename);
                 disposition.ModificationDate = System.IO.File.GetLastWriteTime(filename);
@@ -121,7 +129,7 @@ namespace ConsoleApp1
                 myMail.Subject = $"DiagTool - {email}";
                 myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
-                myMail.Body = "<p>Ol&aacute;,</p><p>Uma nova analise foi enviada, favor verificar o arquivo em anexo.</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><strong>DiagTool</strong> -<em> powered by</em> Casa de Software CPMIDIAS.</p>"; 
+                myMail.Body = "<p>Ol&aacute;,</p><p>Uma nova analise foi enviada, favor verificar o arquivo em anexo.</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><strong>DiagTool</strong> -<em> powered by</em> Casa de Software CPMIDIAS.</p>";
                 myMail.BodyEncoding = System.Text.Encoding.UTF8;
                 myMail.IsBodyHtml = true;
 
